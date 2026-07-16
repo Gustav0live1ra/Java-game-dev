@@ -1,14 +1,13 @@
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 
-
 public class Game extends Canvas implements Runnable{
     int rectX = 0;
     int rectY;
     int rectWidth = 200;
     int rectHeight = 80;
-    int rectSpeed = 2;
-    int volta=0;
+    int rectSpeedX = 3;
+    int rectSpeedY = 3;
 
     boolean running;
     Thread gameThread = new Thread(this);
@@ -37,16 +36,29 @@ public class Game extends Canvas implements Runnable{
 
     public void update(){
 
-        if(volta % 2 ==0){
-            rectX += rectSpeed;
-            if(rectX + rectWidth == getWidth()){
-                volta++;
-            }
-        }else{
-            rectX -= rectSpeed;
-            if(rectX == 0){
-                volta++;
-            }
+        rectX += rectSpeedX;
+        rectY += rectSpeedY;
+
+        //borda direita eixoX
+        if(rectX + rectWidth >= getWidth() ){
+            rectX = getWidth() - rectWidth;
+            rectSpeedX = -rectSpeedX;
+        }
+        //borda esquerda eixoX
+        else if(rectX <= 0){
+            rectX = 0;
+            rectSpeedX = -rectSpeedX;
+        }
+
+        //borda de baixo eixoY
+        if(rectY + rectHeight >= getHeight()){
+            rectY = getHeight() - rectHeight;
+            rectSpeedY = -rectSpeedY;
+        }
+        //borda de cima eixoY
+        else if(rectY <= 0){
+            rectY = 0;
+            rectSpeedY = -rectSpeedY;
         }
 
     }
