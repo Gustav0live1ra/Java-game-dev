@@ -1,17 +1,18 @@
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 
-public class Game extends Canvas implements Runnable, KeyListener {
+public class Game extends Canvas implements Runnable, MouseListener {
     int rectX;
     int rectY;
     int rectWidth = 200;
     int rectHeight = 80;
     int rectSpeed = 2;
-    boolean up,down,left,right;
+    int clickX=-1000, clickY=-1000;
     boolean running;
     Thread gameThread = new Thread(this);
+    KeyHandler keyHandler = new KeyHandler();
 
     public static void main(String[] args) {
 
@@ -28,8 +29,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
         this.setPreferredSize(dimension);
         rectY = (height - rectHeight) / 2;
         rectX = (width - rectWidth) / 2;
-        addKeyListener(this);
+        addKeyListener(keyHandler);
         setFocusable(true);
+        addMouseListener(this);
     }
 
     public void start(){
@@ -40,16 +42,16 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
     public void update(){
 
-        if(up){
+        if(keyHandler.isUp()){
             rectY-=rectSpeed;
         }
-        if(down){
+        if(keyHandler.isDown()){
             rectY+=rectSpeed;
         }
-        if(right){
+        if(keyHandler.isRight()){
             rectX+=rectSpeed;
         }
-        if(left){
+        if(keyHandler.isLeft()){
             rectX-=rectSpeed;
         }
 
@@ -91,6 +93,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
         pincel.setColor(Color.red);
 //      int centralized_width = (getWidth()-200) / 2;
 //      int centralized_height = (getHeight()-80) / 2;
+        pincel.fillOval(clickX - 15,clickY-15,30,30);
+        pincel.drawOval(clickX - 15,clickY-15,30,30);
         pincel.fillRect(rectX, rectY, rectWidth, rectHeight);
         pincel.drawRect(rectX, rectY, rectWidth, rectHeight);
         pincel.dispose();
@@ -131,35 +135,28 @@ public class Game extends Canvas implements Runnable, KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        clickX = e.getX();
+        clickY = e.getY();
 
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        int tecla = e.getKeyCode();
-        if(tecla == KeyEvent.VK_W){
-            up = true;
-        }else if(tecla == KeyEvent.VK_A){
-            left = true;
-        }else if(tecla == KeyEvent.VK_S){
-            down = true;
-        }else if(tecla == KeyEvent.VK_D){
-            right = true;
-        }
+    public void mouseReleased(MouseEvent e) {
+
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-        int tecla = e.getKeyCode();
-        if(tecla == KeyEvent.VK_W){
-            up = false;
-        }else if(tecla == KeyEvent.VK_A){
-            left = false;
-        }else if(tecla == KeyEvent.VK_S){
-            down = false;
-        }else if(tecla == KeyEvent.VK_D){
-            right = false;
-        }
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }
