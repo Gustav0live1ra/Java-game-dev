@@ -1,14 +1,15 @@
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 
-public class Game extends Canvas implements Runnable{
-    int rectX = 0;
+public class Game extends Canvas implements Runnable, KeyListener {
+    int rectX;
     int rectY;
     int rectWidth = 200;
     int rectHeight = 80;
-    int rectSpeedX = 3;
-    int rectSpeedY = 3;
-
+    int rectSpeed = 2;
+    boolean up,down,left,right;
     boolean running;
     Thread gameThread = new Thread(this);
 
@@ -26,6 +27,9 @@ public class Game extends Canvas implements Runnable{
         Dimension dimension = new Dimension(width, height);
         this.setPreferredSize(dimension);
         rectY = (height - rectHeight) / 2;
+        rectX = (width - rectWidth) / 2;
+        addKeyListener(this);
+        setFocusable(true);
     }
 
     public void start(){
@@ -36,29 +40,39 @@ public class Game extends Canvas implements Runnable{
 
     public void update(){
 
-        rectX += rectSpeedX;
-        rectY += rectSpeedY;
+        if(up){
+            rectY-=rectSpeed;
+        }
+        if(down){
+            rectY+=rectSpeed;
+        }
+        if(right){
+            rectX+=rectSpeed;
+        }
+        if(left){
+            rectX-=rectSpeed;
+        }
 
         //borda direita eixoX
         if(rectX + rectWidth >= getWidth() ){
             rectX = getWidth() - rectWidth;
-            rectSpeedX = -rectSpeedX;
+
         }
         //borda esquerda eixoX
         else if(rectX <= 0){
             rectX = 0;
-            rectSpeedX = -rectSpeedX;
+
         }
 
         //borda de baixo eixoY
         if(rectY + rectHeight >= getHeight()){
             rectY = getHeight() - rectHeight;
-            rectSpeedY = -rectSpeedY;
+
         }
         //borda de cima eixoY
         else if(rectY <= 0){
             rectY = 0;
-            rectSpeedY = -rectSpeedY;
+
         }
 
     }
@@ -116,5 +130,36 @@ public class Game extends Canvas implements Runnable{
         }
     }
 
+    @Override
+    public void keyTyped(KeyEvent e) {
 
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int tecla = e.getKeyCode();
+        if(tecla == KeyEvent.VK_W){
+            up = true;
+        }else if(tecla == KeyEvent.VK_A){
+            left = true;
+        }else if(tecla == KeyEvent.VK_S){
+            down = true;
+        }else if(tecla == KeyEvent.VK_D){
+            right = true;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        int tecla = e.getKeyCode();
+        if(tecla == KeyEvent.VK_W){
+            up = false;
+        }else if(tecla == KeyEvent.VK_A){
+            left = false;
+        }else if(tecla == KeyEvent.VK_S){
+            down = false;
+        }else if(tecla == KeyEvent.VK_D){
+            right = false;
+        }
+    }
 }
