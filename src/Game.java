@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
 
 public class Game extends Canvas implements Runnable, MouseListener {
     int rectX;
@@ -10,9 +11,12 @@ public class Game extends Canvas implements Runnable, MouseListener {
     int rectHeight = 80;
     int rectSpeed = 2;
     int clickX=-1000, clickY=-1000;
+
     boolean running;
     Thread gameThread = new Thread(this);
     KeyHandler keyHandler = new KeyHandler();
+    ArrayList<Projectile> projectiles = new ArrayList<>();
+
 
     public static void main(String[] args) {
 
@@ -41,6 +45,15 @@ public class Game extends Canvas implements Runnable, MouseListener {
     }
 
     public void update(){
+
+        for(Projectile p : projectiles){
+            p.update(getWidth(), getHeight());
+            if(p.isArrived()){
+               System.out.println("projéteis na tela: " +( projectiles.size()-1));
+            }
+
+        }
+        projectiles.removeIf(Projectile::isArrived);
 
         if(keyHandler.isUp()){
             rectY-=rectSpeed;
@@ -90,13 +103,14 @@ public class Game extends Canvas implements Runnable, MouseListener {
         Graphics pincel = bs.getDrawGraphics();
         pincel.setColor(Color.black);
         pincel.fillRect(0, 0, getWidth(), getHeight());
-        pincel.setColor(Color.red);
 //      int centralized_width = (getWidth()-200) / 2;
 //      int centralized_height = (getHeight()-80) / 2;
-        pincel.fillOval(clickX - 15,clickY-15,30,30);
-        pincel.drawOval(clickX - 15,clickY-15,30,30);
+        pincel.setColor(Color.red);
         pincel.fillRect(rectX, rectY, rectWidth, rectHeight);
         pincel.drawRect(rectX, rectY, rectWidth, rectHeight);
+        for(Projectile p : projectiles){
+            p.render(pincel);
+        }
         pincel.dispose();
         bs.show();
     }
@@ -142,7 +156,8 @@ public class Game extends Canvas implements Runnable, MouseListener {
     public void mousePressed(MouseEvent e) {
         clickX = e.getX();
         clickY = e.getY();
-
+        projectiles.add(new Projectile(rectX + ((double) rectWidth / 2), rectY + ((double) rectHeight /2), clickX, clickY, 5));
+        System.out.println("projéteis na tela: "+projectiles.size());
     }
 
     @Override
