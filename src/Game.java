@@ -2,20 +2,29 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
-import java.util.ArrayList;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
+import javax.imageio.ImageIO;
+
 
 public class Game extends Canvas implements Runnable, MouseListener {
+    boolean debugMode=false;
+
     int rectX;
     int rectY;
-    int rectWidth = 200;
-    int rectHeight = 80;
+    int rectWidth = 45;
+    int rectHeight = 45;
     int rectSpeed = 2;
-    int clickX=-1000, clickY=-1000;
+    int clickX, clickY;
 
     boolean running;
     Thread gameThread = new Thread(this);
     KeyHandler keyHandler = new KeyHandler();
-    ArrayList<Projectile> projectiles = new ArrayList<>();
+    CopyOnWriteArrayList<Projectile> projectiles = new CopyOnWriteArrayList<>();
+    BufferedImage sprite;
+
 
 
     public static void main(String[] args) {
@@ -36,6 +45,11 @@ public class Game extends Canvas implements Runnable, MouseListener {
         addKeyListener(keyHandler);
         setFocusable(true);
         addMouseListener(this);
+        try {
+            sprite = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/res/Tank.png")));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void start(){
@@ -93,6 +107,7 @@ public class Game extends Canvas implements Runnable, MouseListener {
     }
 
     public void render() {
+
         if (getBufferStrategy() == null) {
             createBufferStrategy(3);
             return;
@@ -105,9 +120,13 @@ public class Game extends Canvas implements Runnable, MouseListener {
         pincel.fillRect(0, 0, getWidth(), getHeight());
 //      int centralized_width = (getWidth()-200) / 2;
 //      int centralized_height = (getHeight()-80) / 2;
-        pincel.setColor(Color.red);
-        pincel.fillRect(rectX, rectY, rectWidth, rectHeight);
-        pincel.drawRect(rectX, rectY, rectWidth, rectHeight);
+        pincel.setColor(Color.yellow);
+        pincel.drawImage(sprite, rectX, rectY, rectWidth, rectHeight, null);
+
+        if(debugMode) {
+            pincel.drawRect(rectX, rectY, rectWidth, rectHeight);
+        }
+
         for(Projectile p : projectiles){
             p.render(pincel);
         }
@@ -156,7 +175,7 @@ public class Game extends Canvas implements Runnable, MouseListener {
     public void mousePressed(MouseEvent e) {
         clickX = e.getX();
         clickY = e.getY();
-        projectiles.add(new Projectile(rectX + ((double) rectWidth / 2), rectY + ((double) rectHeight /2), clickX, clickY, 5));
+        projectiles.add(new Projectile(rectX + ((double) rectWidth / 2), rectY - 30 + ((double) rectHeight /2), clickX, clickY, 5));
         System.out.println("projéteis na tela: "+projectiles.size());
     }
 
